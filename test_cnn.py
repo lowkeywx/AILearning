@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
-from model import Net
+from model.CNN import CNN as Net
 
 import matplotlib.pyplot as plt
 
@@ -30,6 +30,7 @@ for epoch in range(num_epochs):
     running_loss = 0.0
     for i, data in enumerate(train_loader, 0):
         inputs, labels = data
+        # 这里需要注意，模型和数据都需要放到相同的设备
         inputs = inputs.to(device)
         labels = labels.to(device)
         optimizer.zero_grad()

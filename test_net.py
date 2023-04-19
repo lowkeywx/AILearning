@@ -3,20 +3,10 @@ import matplotlib
 matplotlib.use('TkAgg',force=True)
 from matplotlib import pyplot as plt
 import numpy as np
-
-class Net(torch.nn.Module):
-    def __init__(self, in_features, hiden, out_feature):
-        super().__init__()
-        self.hidden = torch.nn.Linear(in_features, hiden)
-        self.predition = torch.nn.Linear(hiden, out_feature)
-    
-    def forward(self, x):
-        x = torch.relu(self.hidden(x))
-        x = self.predition(x)
-        return x
+from model.Net import Net as SampleNet
     
 # 输入的参数与这里指定的维度必须一致
-net = Net(1, 10, 1)
+net = SampleNet(1, 10, 1)
 print(net)
 x = torch.unsqueeze(torch.linspace(-1,1,100),1)
 # 生成的数据是1行100百列，即1*100。与神经网络的维度不一致，不能兼容

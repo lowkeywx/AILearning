@@ -16,8 +16,15 @@ y1 = torch.ones(100)
 x = torch.cat((x0,x1),0).type(torch.FloatTensor)
 y = torch.cat((y0,y1),).type(torch.LongTensor)
 
+net_quick = torch.nn.Sequential(
+    torch.nn.Linear(2, 10),
+    torch.nn.ReLU(),
+    torch.nn.Linear(10, 2)
+)
 # 由于输出数据是100*2（100行2列），所以输入feature需要为2，一次取一行
-net = SampleNet(2,10,2)
+# net = SampleNet(2,10,2)
+net = net_quick
+
 opt = torch.optim.SGD(net.parameters(), lr = 0.002)
 loss_f = torch.nn.CrossEntropyLoss()
 

@@ -24,10 +24,11 @@ class RNN(torch.nn.Module):
         out_r = out_r.view(-1,32)
         out_r = self.out(out_r)
         # 返回的结果什么形状其实自己定义就好， 接口上说明就行。 这里为了统一，也弄成和input一样的形状
-        out_r = out_r.view(-1, out_r.size(0), 1)
+        # out_r = out_r.view(-1, out_r.size(0), 1)
         # 不知道为什么pytorch的rnn自己不处理state，需要手动传入
         # 如果业务上不需要这个stat，可以将其保存到类中。这里就将其返回了
-        return out_r, stat
+        # return out_r, stat
+        return out_r.view(-1), stat
 
   
 net = RNN()
@@ -47,7 +48,8 @@ for step in range(60):
     # star-end,取TIME_STEP个
     data = torch.linspace(start, end, TIME_STEP, dtype=torch.float)
     input_data = torch.sin(data).view(1,-1, 1)
-    target_data = torch.cos(data).view(1,-1, 1)
+    # target_data = torch.cos(data).view(1,-1, 1)
+    target_data = torch.cos(data)
     
     
     pre_out, state = net(input_data, state)
@@ -59,8 +61,10 @@ for step in range(60):
     loss.backward()
     opt.step()
     
-    plt.plot(data, target_data.view(-1).data, 'r-',label='jieguo')
-    plt.plot(data, pre_out.view(-1).data, 'b-',label='pre')
+    # plt.plot(data, target_data.view(-1).data, 'r-',label='jieguo')
+    # plt.plot(data, pre_out.view(-1).data, 'b-',label='pre')
+    plt.plot(data, target_data.data, 'r-',label='jieguo')
+    plt.plot(data, pre_out.data, 'b-',label='pre')
     plt.draw()
     plt.pause(0.2)
     

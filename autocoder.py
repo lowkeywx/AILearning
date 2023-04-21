@@ -33,10 +33,13 @@ class AutoCoder(torch.nn.Module):
         super(AutoCoder, self).__init__()
         self.encoder = torch.nn.Sequential(
             torch.nn.Linear(in_features, 128),
+            # torch.nn.Dropout(0.5),
             torch.nn.Tanh(),
             torch.nn.Linear(128, 64),
+            # torch.nn.Dropout(0.5),
             torch.nn.Tanh(),        
             torch.nn.Linear(64, 32),
+            # torch.nn.Dropout(0.3),            
             torch.nn.Tanh(),
             torch.nn.Linear(32, 16),
             torch.nn.Tanh(),
@@ -46,10 +49,13 @@ class AutoCoder(torch.nn.Module):
             torch.nn.Linear(3, 16),
             torch.nn.Tanh(),
             torch.nn.Linear(16, 32),
+            # torch.nn.Dropout(0.3),
             torch.nn.Tanh(),
             torch.nn.Linear(32, 64),
+            # torch.nn.Dropout(0.5),
             torch.nn.Tanh(),
             torch.nn.Linear(64, 128),
+            # torch.nn.Dropout(0.5),
             torch.nn.Tanh(),
             torch.nn.Linear(128, in_features),
             torch.nn.Sigmoid()
@@ -76,7 +82,10 @@ for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
     opt.zero_grad()
     loss.backward()
     opt.step()
-    if step % 500 == 0:
+    if step % 500 == 0:        
+        net.eval()
+        en,de = net(in_data)
+        net.train()        
         for i in range(BANTCH_SIZE):
             axs[0][i].clear()
             axs[1][i].clear()

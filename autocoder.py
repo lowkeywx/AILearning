@@ -70,6 +70,8 @@ net = AutoCoder(28*28,3)
 
 opt = torch.optim.Adam(net.parameters(),lr=LR)
 loss_function = torch.nn.MSELoss()
+lr_sh = torch.optim.lr_scheduler.StepLR(opt, step_size=2000,gamma=0.9)
+
 
 f, axs = plt.subplots(2, BANTCH_SIZE, figsize=(5, 2))
 for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
@@ -82,6 +84,7 @@ for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
     opt.zero_grad()
     loss.backward()
     opt.step()
+    lr_sh.step()
     if step % 500 == 0:        
         net.eval()
         en,de = net(in_data)
@@ -94,6 +97,8 @@ for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
             plt.suptitle('step: {}, loss: {}'.format(step, loss.data))
         plt.draw()
         plt.pause(0.1)
+        print(opt.param_groups[0]['lr'])
+        
 
 
     

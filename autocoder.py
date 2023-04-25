@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
+from torch.utils.tensorboard import SummaryWriter
 
 
 EPOCH=1
@@ -65,13 +66,14 @@ class AutoCoder(torch.nn.Module):
         de = self.decoder(en)
         return en, de
 
+writer = SummaryWriter()
   
 net = AutoCoder(28*28,3)
+# writer.add_graph(net)
 
 opt = torch.optim.Adam(net.parameters(),lr=LR)
 loss_function = torch.nn.MSELoss()
 lr_sh = torch.optim.lr_scheduler.StepLR(opt, step_size=2000,gamma=0.9)
-
 
 f, axs = plt.subplots(2, BANTCH_SIZE, figsize=(5, 2))
 for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
@@ -81,23 +83,41 @@ for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
     en,de = net(in_data)
     loss = loss_function(de, target_data)
     
+    writer.add_scalars('loss', {'loss': loss}, step)
+    
     opt.zero_grad()
     loss.backward()
     opt.step()
     lr_sh.step()
-    if step % 500 == 0:        
+    if step % 500 == 0:
+        # 将模型切换为验证模式        
         net.eval()
         en,de = net(in_data)
-        net.train()        
-        for i in range(BANTCH_SIZE):
+        # 将模型切换为训练模式
+        net.train()       
+        # 将一组训练和验证数据进行形状变换，一组变成一张图片纵向排列
+        tmp_images = torch.stack([in_data.view(1,-1,28).data, de.view(1,-1,28).data],dim=0)
+        # 将纵向排列变换为横向排列,但是单个角度也会随之变换
+        # tmp_images = tmp_images.transpose(3, 2)
+        
+        
+        # tmp_images = torchvision.utils.make_grid(tensor)
+        
+        writer.add_images('loss/image', tmp_images, global_step=step) 
+        for i in range(BANTCH_SIZE):            
             axs[0][i].clear()
             axs[1][i].clear()
             axs[0][i].imshow(in_data[i,:].view(28,28).data)
             axs[1][i].imshow(de[i,:].view(28,28).data)
             plt.suptitle('step: {}, loss: {}'.format(step, loss.data))
-        plt.draw()
-        plt.pause(0.1)
+        # plt.draw()
+        # plt.pause(0.1)
+        
+        # 这个每个figure都会产生一个文件，有点费文件夹
+        # writer.add_figure('loss/figure', f,global_step=step)
         print(opt.param_groups[0]['lr'])
+        
+    writer.close()
         
 
 

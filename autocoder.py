@@ -96,14 +96,12 @@ for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
         # 将模型切换为训练模式
         net.train()       
         # 将一组训练和验证数据进行形状变换，一组变成一张图片纵向排列
-        tmp_images = torch.stack([in_data.view(1,-1,28).data, de.view(1,-1,28).data],dim=0)
+        tmp_images = torch.cat([in_data.view(-1, 28,28).data, de.view(-1, 28,28).data],dim=0).view(-1,1,28,28)
         # 将纵向排列变换为横向排列,但是单个角度也会随之变换
         # tmp_images = tmp_images.transpose(3, 2)
-        
-        
-        # tmp_images = torchvision.utils.make_grid(tensor)
-        
-        writer.add_images('loss/image', tmp_images, global_step=step) 
+        # 这种将图片合成一张比较好，当然也可以通过形状变换实现相同的排列方式stack可以实现
+        tmp_images = torchvision.utils.make_grid(tmp_images,nrow=5)
+        writer.add_image('loss/image', tmp_images, global_step=step) 
         for i in range(BANTCH_SIZE):            
             axs[0][i].clear()
             axs[1][i].clear()

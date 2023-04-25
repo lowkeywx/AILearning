@@ -83,7 +83,7 @@ for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
     en,de = net(in_data)
     loss = loss_function(de, target_data)
     
-    writer.add_scalars('loss', {'loss': loss}, step)
+    writer.add_scalars('1', {'loss': loss}, step)
     
     opt.zero_grad()
     loss.backward()
@@ -101,7 +101,7 @@ for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
         # tmp_images = tmp_images.transpose(3, 2)
         # 这种将图片合成一张比较好，当然也可以通过形状变换实现相同的排列方式stack可以实现
         tmp_images = torchvision.utils.make_grid(tmp_images,nrow=5)
-        writer.add_image('loss/image', tmp_images, global_step=step) 
+        writer.add_image('2/image', tmp_images, global_step=step) 
         for i in range(BANTCH_SIZE):            
             axs[0][i].clear()
             axs[1][i].clear()
@@ -112,7 +112,7 @@ for step,(bantch_x, bantch_y) in enumerate(train_data_loader):
         # plt.pause(0.1)
         
         # 这个每个figure都会产生一个文件，有点费文件夹
-        # writer.add_figure('loss/figure', f,global_step=step)
+        writer.add_figure('3/figure', f,global_step=step)
         print(opt.param_groups[0]['lr'])
         
     writer.close()
